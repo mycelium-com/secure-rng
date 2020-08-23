@@ -51,6 +51,11 @@ set_target_properties(secure-rng PROPERTIES
    PUBLIC_HEADER "include/secure-rng.h"
 )
 
+add_executable(bench_rng misc/bench_rng.c $<TARGET_OBJECTS:secure-rng>)
+target_include_directories(bench_rng PRIVATE include)
+target_link_libraries(bench_rng secure-rng)
+
+
 include(GNUInstallDirs)
 install(TARGETS secure-rng
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
