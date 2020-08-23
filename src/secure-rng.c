@@ -9,7 +9,7 @@
 
 static const uint64_t kMaxReseedCount = UINT64_C(1) << 48;
 
-static void AES256_CTR_DRBG_Update(uint8_t *provided_data, uint8_t *Key, uint8_t *V)
+static void AES256_CTR_DRBG_Update(uint8_t provided_data[48], uint8_t Key[32], uint8_t V[16])
 {
     uint8_t temp[48];
 
@@ -26,21 +26,29 @@ static void AES256_CTR_DRBG_Update(uint8_t *provided_data, uint8_t *Key, uint8_t
 
         aesctr256 (temp+16*i, Key, V, 16);
     }
-    if ( provided_data != NULL )
-        for (int i=0; i<48; i++)
+    if ( provided_data != NULL ) {
+        for (int i=0; i<48; i++) {
             temp[i] ^= provided_data[i];
+        }
+    }
+
     memcpy(Key, temp, 32);
     memcpy(V, temp+32, 16);
 }
 
-void secure_rng_seed(struct secure_rng_ctx *ctx, const uint8_t *entropy_input, const uint8_t *personalization_string)
+int secure_rng_seed(struct secure_rng_ctx *ctx, const uint8_t entropy_input[48], const uint8_t *personalization_string, size_t personalization_len)
 {
     uint8_t seed_material[48];
 
+    if (personalization_len > 48) {
+        return RNG_BAD_MAXLEN;
+    }
+
     memcpy(seed_material, entropy_input, 48);
-    if (personalization_string)
-        for (int i=0; i<48; i++)
-            seed_material[i] ^= personalization_string[i];
+
+    for (int i=0; i < personalization_len; ++i) {
+        seed_material[i] ^= personalization_string[i];
+    }
 
     static const uint8_t kInitMask[48] = {
         0x53, 0x0f, 0x8a, 0xfb, 0xc7, 0x45, 0x36, 0xb9, 0xa9, 0x63, 0xb4, 0xf1,
@@ -49,22 +57,38 @@ void secure_rng_seed(struct secure_rng_ctx *ctx, const uint8_t *entropy_input, c
         0x37, 0xa6, 0x2a, 0x74, 0xd1, 0xa2, 0xf5, 0x8e, 0x75, 0x06, 0x35, 0x8e,
     };
 
-    for (int i = 0; i < 48; i++)
+    for (int i = 0; i < 48; i++) {
         seed_material[i] ^= kInitMask[i];
+    }
 
     memset(ctx->Key, 0x00, 32);
     memset(ctx->V, 0x00, 16);
 
     AES256_CTR_DRBG_Update(seed_material, ctx->Key, ctx->V);
     ctx->reseed_counter = 1;
+    
+    return RNG_SUCCESS;
 }
 
-void secure_rng_reseed(struct secure_rng_ctx *ctx, const uint8_t *entropy_input)
+int secure_rng_reseed(struct secure_rng_ctx *ctx, const uint8_t entropy[48], const uint8_t *additional_data, size_t additional_data_len)
 {
-    uint8_t seed_material[48];
-    memcpy(seed_material, entropy_input, 48);
-    AES256_CTR_DRBG_Update(seed_material, ctx->Key, ctx->V);
-    ctx->reseed_counter++;
+    uint8_t entropy_copy[48];
+    memcpy(entropy_copy, entropy, 48);
+
+    if (additional_data_len > 0) {
+        if (additional_data_len > 48) {
+            return RNG_BAD_MAXLEN;
+        }
+
+        for (size_t i = 0; i < additional_data_len; i++) {
+            entropy_copy[i] ^= additional_data[i];
+        }
+    }
+
+    AES256_CTR_DRBG_Update(entropy_copy, ctx->Key, ctx->V);
+    ctx->reseed_counter = 1;
+
+    return RNG_SUCCESS;
 }
 
 int secure_rng_bytes(struct secure_rng_ctx *ctx, uint8_t *x, size_t xlen)
@@ -72,7 +96,7 @@ int secure_rng_bytes(struct secure_rng_ctx *ctx, uint8_t *x, size_t xlen)
     uint8_t block[16];
     int i = 0;
 
-    if (ctx->reseed_counter > MAX_GENERATE_LENGTH) {
+    if (xlen > MAX_GENERATE_LENGTH) {
         return RNG_BAD_MAXLEN;
     }
 
@@ -106,4 +130,3 @@ int secure_rng_bytes(struct secure_rng_ctx *ctx, uint8_t *x, size_t xlen)
 
     return RNG_SUCCESS;
 }
-
