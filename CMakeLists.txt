@@ -55,6 +55,9 @@ add_executable(bench_rng misc/bench_rng.c $<TARGET_OBJECTS:secure-rng>)
 target_include_directories(bench_rng PRIVATE include)
 target_link_libraries(bench_rng secure-rng)
 
+add_executable(test_rng misc/test_rng.c $<TARGET_OBJECTS:secure-rng>)
+target_include_directories(test_rng PRIVATE include)
+target_link_libraries(test_rng secure-rng)
 
 include(GNUInstallDirs)
 install(TARGETS secure-rng
