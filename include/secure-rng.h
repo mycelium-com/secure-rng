@@ -24,6 +24,7 @@ extern "C" {
 #endif
 
 void secure_rng_seed(struct secure_rng_ctx *ctx, const uint8_t *entropy_input, const uint8_t *personalization_string);
+void secure_rng_reseed(struct secure_rng_ctx *ctx, const uint8_t *entropy_input);
 int secure_rng_bytes(struct secure_rng_ctx *ctx, uint8_t *x, size_t xlen);
 
 #ifdef __cplusplus

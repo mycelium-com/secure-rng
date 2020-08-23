@@ -45,6 +45,14 @@ void secure_rng_seed(struct secure_rng_ctx *ctx, const uint8_t *entropy_input, c
     ctx->reseed_counter = 1;
 }
 
+void secure_rng_reseed(struct secure_rng_ctx *ctx, const uint8_t *entropy_input)
+{
+    uint8_t seed_material[48];
+    memcpy(seed_material, entropy_input, 48);
+    AES256_CTR_DRBG_Update(seed_material, ctx->Key, ctx->V);
+    ctx->reseed_counter++;
+}
+
 int secure_rng_bytes(struct secure_rng_ctx *ctx, uint8_t *x, size_t xlen)
 {
     uint8_t block[16];
