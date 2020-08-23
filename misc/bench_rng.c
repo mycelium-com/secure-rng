@@ -3,7 +3,8 @@
 #include <stdio.h>
 #include <time.h>
 
-uint8_t fake_entropy[48] = {0};
+uint8_t fake_entropy1[48] = {0};
+uint8_t fake_entropy2[48] = {1};
 uint8_t fake_personalization[48] = {0};
 
 uint8_t fake_key[32];
@@ -17,10 +18,13 @@ int main() {
     clock_t toc;
     double elapsed;
     
-    const unsigned num_keys = 10000;
-    const unsigned num_seeds = 10000;
+    const unsigned num_keys = 1000000;
+    const unsigned num_seeds = 1000000;
 
-    secure_rng_seed(&ctx, fake_entropy, fake_personalization);
+    if (RNG_SUCCESS != secure_rng_seed(&ctx, fake_entropy1, fake_personalization, sizeof(fake_personalization))) {
+        printf("secure_rng_seed() failed\n");
+        return -1;
+    }
     
     printf("Computing %d random private keys...\n", num_keys);
 
@@ -39,6 +43,11 @@ int main() {
     elapsed = (double)(toc - tic) / CLOCKS_PER_SEC;
 
     printf("Elapsed: %f seconds (%f keys/s)\n", elapsed, num_keys / elapsed);
+
+    if (RNG_SUCCESS != secure_rng_reseed(&ctx, fake_entropy2, NULL, 0)) {
+        printf("secure_rng_seed() failed\n");
+        return -1;
+    }
 
     printf("Computing %d random private seeds...\n", num_seeds);
 
