@@ -3,17 +3,17 @@
 ```C
 /**
  * SEED(ctx, entropy, personalization)
- * Init generator instance with provided 48 bytes of entropy and 48 bytes of personalization id.
+ * Init generator instance with provided 48 bytes of entropy and personalization id.
  */
-void secure_rng_seed(struct secure_rng_ctx *ctx, const uint8_t *entropy_input, const uint8_t *personalization_string);
+void secure_rng_seed(struct secure_rng_ctx *ctx, const uint8_t entropy_input[48], const uint8_t *personalization_string, size_t personalization_len);
 ```
 
 ```C
 /**
  * PUT(ctx, entropy)
- * Update generator instance state with provided 48 bytes of entropy.
+ * Update generator instance state with provided 48 bytes of entropy and additional data.
  */
-void secure_rng_reseed(struct secure_rng_ctx *ctx, const uint8_t *entropy_input);
+void secure_rng_reseed(struct secure_rng_ctx *ctx, const uint8_t entropy_input[48], const uint8_t *additional_data, size_t additional_data_len);
 ```
 
 ```C
