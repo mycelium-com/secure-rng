@@ -8,15 +8,16 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#define RNG_SUCCESS      0
-#define RNG_BAD_MAXLEN  -1
-#define RNG_BAD_OUTBUF  -2
-#define RNG_BAD_REQ_LEN -3
+#define RNG_SUCCESS       0
+#define RNG_BAD_MAXLEN   -1
+#define RNG_NEED_RESEED  -2
+
+#define MAX_GENERATE_LENGTH 65535
 
 struct secure_rng_ctx {
     unsigned char   Key[32];
     unsigned char   V[16];
-    unsigned int    reseed_counter;
+    uint64_t    reseed_counter;
 } __attribute__ ((aligned (16)));
 
 #ifdef __cplusplus

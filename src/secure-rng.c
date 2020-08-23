@@ -7,6 +7,8 @@
 #include "aes.h"
 #include "secure-rng.h"
 
+static const uint64_t kMaxReseedCount = UINT64_C(1) << 48;
+
 static void AES256_CTR_DRBG_Update(uint8_t *provided_data, uint8_t *Key, uint8_t *V)
 {
     uint8_t temp[48];
@@ -69,6 +71,14 @@ int secure_rng_bytes(struct secure_rng_ctx *ctx, uint8_t *x, size_t xlen)
 {
     uint8_t block[16];
     int i = 0;
+
+    if (ctx->reseed_counter > MAX_GENERATE_LENGTH) {
+        return RNG_BAD_MAXLEN;
+    }
+
+    if (ctx->reseed_counter > kMaxReseedCount) {
+        return RNG_NEED_RESEED;
+    }
 
     while ( xlen > 0 ) {
         //increment V

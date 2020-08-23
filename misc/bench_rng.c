@@ -17,8 +17,8 @@ int main() {
     clock_t toc;
     double elapsed;
     
-    const unsigned num_keys = 1000000;
-    const unsigned num_seeds = 1000000;
+    const unsigned num_keys = 10000;
+    const unsigned num_seeds = 10000;
 
     secure_rng_seed(&ctx, fake_entropy, fake_personalization);
     
