@@ -33,13 +33,13 @@ try_compile(
 
 if (secure_rng_aarch64)
 message(STATUS "Looking for AES support - found armv8 SIMD")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS_ORIG} -march=armv8-a+simd+crypto")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS_ORIG} -march=armv8-a+simd+crypto -Os")
 add_library(secure-rng src/aarch64/aes.c src/secure-rng.c)
 endif()
 
 if (secure_rng_x86)
 message(STATUS "Looking for AES support - found intel AES-NI")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS_ORIG} -maes")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS_ORIG} -maes -Os")
 add_library(secure-rng src/x86/aes.c src/secure-rng.c)
 endif()
 
