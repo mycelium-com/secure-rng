@@ -170,6 +170,7 @@ int secure_rng_bytes(struct secure_rng_ctx *ctx, uint8_t *x, size_t xlen) {
             drbg_run_one_round(block, ctx);
             memcpy(x, block, xrem);
             // Increment x by xrem
+            x += xrem;
         }
     }
 
