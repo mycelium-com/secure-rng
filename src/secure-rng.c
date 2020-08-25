@@ -49,7 +49,7 @@ inline static void drbg_apply(const uint8_t buffer[48], struct secure_rng_ctx *c
 
 int secure_rng_seed(struct secure_rng_ctx *ctx, const uint8_t entropy_input[48], const uint8_t *personalization_string, size_t personalization_len) {
     uint8_t round_bytes[48] = {0};
-    uint8_t seed_material[48];
+    uint8_t seed_material[48] = {0};
 
     // Check additional entropy buffer length
     if (personalization_len > 0) {
@@ -102,8 +102,8 @@ int secure_rng_seed(struct secure_rng_ctx *ctx, const uint8_t entropy_input[48],
 }
 
 int secure_rng_reseed(struct secure_rng_ctx *ctx, const uint8_t entropy[48], const uint8_t *additional_data, size_t additional_data_len) {
-    uint8_t entropy_copy[48];
-    uint8_t round_bytes[48];
+    uint8_t entropy_copy[48] = {0};
+    uint8_t round_bytes[48] = {0};
     memcpy(entropy_copy, entropy, 48);
 
     // Handle additional entropy
@@ -135,8 +135,8 @@ int secure_rng_reseed(struct secure_rng_ctx *ctx, const uint8_t entropy[48], con
 
 int secure_rng_bytes(struct secure_rng_ctx *ctx, uint8_t *x, size_t xlen) {
     // Buffer for generated block
-    uint8_t block[16];
-    uint8_t round_bytes[48];
+    uint8_t block[16] = {0};
+    uint8_t round_bytes[48] = {0};
     const uint8_t *xend = x + xlen;
     
     // Remaining length
