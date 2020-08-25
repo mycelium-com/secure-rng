@@ -47,8 +47,8 @@ inline static void drbg_apply_round(const uint8_t buffer[48], struct secure_rng_
 }
 
 int secure_rng_seed(struct secure_rng_ctx *ctx, const uint8_t entropy_input[48], const uint8_t *personalization_string, size_t personalization_len) {
+    uint8_t round_bytes[48] = {0};
     uint8_t seed_material[48];
-    uint8_t round_bytes[48];
 
     // Check additional entropy buffer length
     if (personalization_len > 0) {
@@ -88,8 +88,7 @@ int secure_rng_seed(struct secure_rng_ctx *ctx, const uint8_t entropy_input[48],
     
     // Key and counter are
     //  initialized by zeros
-    memset(ctx->Key, 0x00, 32);
-    memset(ctx->V, 0x00, 16);
+    drbg_apply_round(round_bytes, ctx);
 
     // Run first three rounds to calculate
     //  AES key and init counter
