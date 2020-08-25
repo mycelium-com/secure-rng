@@ -33,7 +33,7 @@ inline static void drbg_run_three_rounds(uint8_t buffer[48], struct secure_rng_c
     drbg_run_one_round(buffer + 32, ctx);
 }
 
-inline static void drbg_apply_data(uint8_t buffer[48], const uint8_t provided_data[48]) {
+inline static void drbg_mix(uint8_t buffer[48], const uint8_t provided_data[48]) {
     if (provided_data != NULL) {
         for (int i=0; i<48; ++i) {
             buffer[i] ^= provided_data[i];
@@ -41,7 +41,7 @@ inline static void drbg_apply_data(uint8_t buffer[48], const uint8_t provided_da
     }
 }
 
-inline static void drbg_apply_round(const uint8_t buffer[48], struct secure_rng_ctx *ctx) {
+inline static void drbg_apply(const uint8_t buffer[48], struct secure_rng_ctx *ctx) {
     memcpy(ctx->Key, buffer, 32);
     memcpy(ctx->V, buffer+32, 16);
 }
@@ -88,13 +88,13 @@ int secure_rng_seed(struct secure_rng_ctx *ctx, const uint8_t entropy_input[48],
     
     // Key and counter are
     //  initialized by zeros
-    drbg_apply_round(round_bytes, ctx);
+    drbg_apply(round_bytes, ctx);
 
     // Run first three rounds to calculate
     //  AES key and init counter
     drbg_run_three_rounds(round_bytes, ctx);
-    drbg_apply_data(round_bytes, seed_material);
-    drbg_apply_round(round_bytes, ctx);
+    drbg_mix(round_bytes, seed_material);
+    drbg_apply(round_bytes, ctx);
     ctx->reseed_counter = 1;
 
     return RNG_SUCCESS;
@@ -125,8 +125,8 @@ int secure_rng_reseed(struct secure_rng_ctx *ctx, const uint8_t entropy[48], con
 
     // Reset the RNG internal state
     drbg_run_three_rounds(round_bytes, ctx);
-    drbg_apply_data(round_bytes, entropy_copy);
-    drbg_apply_round(round_bytes, ctx);
+    drbg_mix(round_bytes, entropy_copy);
+    drbg_apply(round_bytes, ctx);
     ctx->reseed_counter = 1;
 
     return RNG_SUCCESS;
@@ -172,7 +172,7 @@ int secure_rng_bytes(struct secure_rng_ctx *ctx, uint8_t *x, size_t xlen) {
 
     // Complete by running three generation rounds
     drbg_run_three_rounds(round_bytes, ctx);
-    drbg_apply_round(round_bytes, ctx);
+    drbg_apply(round_bytes, ctx);
     
     // Increment reseed counter
     ctx->reseed_counter++;
