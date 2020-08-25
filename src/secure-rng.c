@@ -155,7 +155,7 @@ int secure_rng_bytes(struct secure_rng_ctx *ctx, uint8_t *x, size_t xlen) {
 
     // Repeat while amount of remaining
     //  bytes is greater than zero
-    while ( xrem = xend - x ) {
+    while ( (xrem = xend - x) ) {
         
         if (xrem > 15) {
             // Generate new block of pseudo random
