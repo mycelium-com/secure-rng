@@ -1,5 +1,7 @@
 # Secure random number generator module
 
+Compact and simple implementation of cryptographically-secure deterministic pseudo-random number generator on top of hardware AES instructions.
+
 ```C
 /**
  * SEED(ctx, entropy, personalization)
@@ -10,7 +12,7 @@ void secure_rng_seed(struct secure_rng_ctx *ctx, const uint8_t entropy_input[48]
 
 ```C
 /**
- * PUT(ctx, entropy)
+ * PUT(ctx, entropy, additional)
  * Update generator instance state with provided 48 bytes of entropy and additional data.
  */
 void secure_rng_reseed(struct secure_rng_ctx *ctx, const uint8_t entropy_input[48], const uint8_t *additional_data, size_t additional_data_len);
