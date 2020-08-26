@@ -47,6 +47,10 @@ inline static void drbg_apply(const uint8_t buffer[48], struct secure_rng_ctx *c
     memcpy(ctx->V, buffer+32, 16);
 }
 
+void secure_rng_set_seeder(struct secure_rng_ctx *ctx, void (*resistance_seeder_function)(uint8_t seed_out[48])) {
+    ctx->resistance_seeder = resistance_seeder_function;
+}
+
 int secure_rng_seed(struct secure_rng_ctx *ctx, const uint8_t entropy_input[48], const uint8_t *personalization_string, size_t personalization_len) {
     uint8_t round_bytes[48] = {0};
     uint8_t seed_material[48] = {0};
@@ -98,6 +102,10 @@ int secure_rng_seed(struct secure_rng_ctx *ctx, const uint8_t entropy_input[48],
     drbg_apply(round_bytes, ctx);
     ctx->reseed_counter = 1;
 
+    // Prediction resistance is
+    //   disabled by default
+    ctx->resistance_seeder = NULL;
+
     return RNG_SUCCESS;
 }
 
@@ -136,7 +144,7 @@ int secure_rng_reseed(struct secure_rng_ctx *ctx, const uint8_t entropy[48], con
 int secure_rng_bytes(struct secure_rng_ctx *ctx, uint8_t *x, size_t xlen) {
     // Buffer for generated block
     uint8_t block[16] = {0};
-    uint8_t round_bytes[48] = {0};
+    uint8_t state_bytes[48] = {0};
     const uint8_t *xend = x + xlen;
     
     // Remaining length
@@ -146,6 +154,13 @@ int secure_rng_bytes(struct secure_rng_ctx *ctx, uint8_t *x, size_t xlen) {
     //  query more than MAX_GENERATE_LENGTH bytes
     if (xlen > MAX_GENERATE_LENGTH || x == NULL) {
         return RNG_BAD_MAXLEN;
+    }
+
+    // If the prediction resistance is enabled then
+    //   query new entropy and use it to seed a generator
+    if (ctx->resistance_seeder != NULL) {
+        ctx->resistance_seeder(state_bytes);
+        secure_rng_reseed(ctx, state_bytes, NULL, 0);
     }
 
     // If the entropy pool is exhausted then request reseeding
@@ -175,8 +190,8 @@ int secure_rng_bytes(struct secure_rng_ctx *ctx, uint8_t *x, size_t xlen) {
     }
 
     // Complete by running three generation rounds
-    drbg_run_three_rounds(round_bytes, ctx);
-    drbg_apply(round_bytes, ctx);
+    drbg_run_three_rounds(state_bytes, ctx);
+    drbg_apply(state_bytes, ctx);
     
     // Increment reseed counter
     ctx->reseed_counter++;
