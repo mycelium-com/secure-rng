@@ -149,7 +149,7 @@ int secure_rng_reseed(struct secure_rng_ctx *ctx, const uint8_t entropy[48], con
     return RNG_SUCCESS;
 }
 
-int secure_rng_bytes(struct secure_rng_ctx *ctx, uint8_t *x, size_t xlen) {
+int secure_rng_bytes(struct secure_rng_ctx *ctx, uint8_t *x, size_t xlen, int resistance) {
     // Buffer for generated block
     uint8_t block[16] = {0};
     uint8_t state_bytes[48] = {0};
@@ -164,16 +164,19 @@ int secure_rng_bytes(struct secure_rng_ctx *ctx, uint8_t *x, size_t xlen) {
         return RNG_BAD_MAXLEN;
     }
 
-    // If the prediction resistance is enabled then
-    //   query new entropy and use it to seed a generator
-    if (ctx->resistance_seeder != NULL && ctx->reseed_counter > ctx->reseed_interval) {
-        ctx->resistance_seeder(state_bytes);
-        secure_rng_reseed(ctx, state_bytes, NULL, 0);
-    }
-
-    // If the entropy pool is exhausted then request reseeding
-    if (ctx->reseed_counter > kMaxReseedCount) {
-        return RNG_NEED_RESEED;
+    // Request reseeding if either entropy pool is
+    //   exhausted or the caller asked us to do so
+    if (resistance || ctx->reseed_counter > ctx->reseed_interval) {
+        // If the prediction resistance is enabled then
+        //   query new entropy and use it to seed a generator
+        if (ctx->resistance_seeder != NULL) {
+            ctx->resistance_seeder(state_bytes);
+            secure_rng_reseed(ctx, state_bytes, NULL, 0);
+        }
+        else {
+            // Reseeding is required
+            return RNG_NEED_RESEED;
+        }
     }
 
     // Repeat while amount of remaining

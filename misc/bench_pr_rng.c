@@ -47,7 +47,7 @@ int main() {
     tic = clock();
 
     for(i = 0; i < num_keys; ++i) {
-        if (RNG_SUCCESS != secure_rng_bytes(&ctx, fake_key, sizeof(fake_key))) {
+        if (RNG_SUCCESS != secure_rng_bytes(&ctx, fake_key, sizeof(fake_key), 0)) {
             printf("secure_rng_bytes() failed\n");
             return -1;
         }
@@ -65,7 +65,7 @@ int main() {
     tic = clock();
 
     for(i = 0; i < num_seeds; ++i) {
-        if (RNG_SUCCESS != secure_rng_bytes(&ctx, fake_seed, sizeof(fake_seed))) {
+        if (RNG_SUCCESS != secure_rng_bytes(&ctx, fake_seed, sizeof(fake_seed), 0)) {
             printf("secure_rng_bytes() failed\n");
             return -1;
         }
