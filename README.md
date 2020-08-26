@@ -28,6 +28,8 @@ Before using the generator, you must create and initialize context structure wit
 /*
  * SET(ctx, seeder, interval)
  * Force generator to invoke seeder function on every interval invocations of secure_rng_bytes.
+ * Seeder function must fill the received buffer with 48 bytes of entropy data. 
+ * Note that it is senseless to use PRNG for seeding. Use only true sources of randomness for seeding.
  */
 void secure_rng_set_seeder(struct secure_rng_ctx *ctx, void (*resistance_seeder_function)(uint8_t seed_out[48]), uint64_t reseed_interval);
 ```
