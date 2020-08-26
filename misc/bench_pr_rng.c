@@ -38,7 +38,8 @@ int main() {
     }
     
     // Enable prediction resistance
-    secure_rng_set_seeder(&ctx, &pr_seeder);
+    //  Set reseed interval to 0 (reseed on every call)
+    secure_rng_set_seeder(&ctx, &pr_seeder, 0);
     
     printf("Computing %d random private keys...\n", num_keys);
 

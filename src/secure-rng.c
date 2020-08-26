@@ -47,8 +47,15 @@ inline static void drbg_apply(const uint8_t buffer[48], struct secure_rng_ctx *c
     memcpy(ctx->V, buffer+32, 16);
 }
 
-void secure_rng_set_seeder(struct secure_rng_ctx *ctx, void (*resistance_seeder_function)(uint8_t seed_out[48])) {
-    ctx->resistance_seeder = resistance_seeder_function;
+void secure_rng_set_seeder(struct secure_rng_ctx *ctx, void (*resistance_seeder_function)(uint8_t seed_out[48]), uint64_t reseed_interval) {
+    if (resistance_seeder_function == NULL) {
+        ctx->resistance_seeder = NULL;
+        ctx->reseed_interval = kMaxReseedCount;
+    }
+    else {
+        ctx->resistance_seeder = resistance_seeder_function;
+        ctx->reseed_interval = reseed_interval;
+    }
 }
 
 int secure_rng_seed(struct secure_rng_ctx *ctx, const uint8_t entropy_input[48], const uint8_t *personalization_string, size_t personalization_len) {
@@ -105,6 +112,7 @@ int secure_rng_seed(struct secure_rng_ctx *ctx, const uint8_t entropy_input[48],
     // Prediction resistance is
     //   disabled by default
     ctx->resistance_seeder = NULL;
+    ctx->reseed_interval = kMaxReseedCount;
 
     return RNG_SUCCESS;
 }
@@ -158,7 +166,7 @@ int secure_rng_bytes(struct secure_rng_ctx *ctx, uint8_t *x, size_t xlen) {
 
     // If the prediction resistance is enabled then
     //   query new entropy and use it to seed a generator
-    if (ctx->resistance_seeder != NULL) {
+    if (ctx->resistance_seeder != NULL && ctx->reseed_counter > ctx->reseed_interval) {
         ctx->resistance_seeder(state_bytes);
         secure_rng_reseed(ctx, state_bytes, NULL, 0);
     }
