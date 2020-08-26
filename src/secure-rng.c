@@ -1,8 +1,3 @@
-//
-//  Created by Bassham, Lawrence E (Fed) on 8/29/17.
-//  Copyright © 2017 Bassham, Lawrence E (Fed). All rights reserved.
-//
-
 #include <string.h>
 #include <stddef.h>
 #include "aes.h"
