@@ -14,7 +14,7 @@ Intel AES-NI and Armv8 Cryptographic Extension are supported.
 
 ### Limitations
 
-* Each context instance has able to provide only limited amount of generation rounds. Once a limit is exhausted, any attempt to generate new data will return RNG_NEED_RESEED error. This limit is hardcoded to 2^64 invocations.
+* Each context instance is able to provide only limited amount of generation rounds. Once a limit is exhausted, any attempt to generate new data will return RNG_NEED_RESEED error. This limit is hardcoded to 2^64 invocations.
 
 * You may deal with previous limitation by enabling prediction resistance. This is may be done done using ```secure_rng_set_seeder``` API. If this feature is enabled then generator instance will be reseeded automatically with specified interval.
 
