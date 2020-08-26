@@ -1,7 +1,3 @@
-//  Created by Bassham, Lawrence E (Fed) on 8/29/17.
-//  Copyright © 2017 Bassham, Lawrence E (Fed). All rights reserved.
-//
-
 #ifndef SECURERNG_H
 #define SECURERNG_H
 
