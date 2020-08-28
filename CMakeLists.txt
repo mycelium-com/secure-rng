@@ -69,6 +69,7 @@ target_link_libraries(test_pr_rng secure-rng)
 
 include(GNUInstallDirs)
 install(TARGETS secure-rng
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
