@@ -51,19 +51,19 @@ set_target_properties(secure-rng PROPERTIES
    PUBLIC_HEADER "include/secure-rng.h"
 )
 
-add_executable(bench_rng misc/bench_rng.c $<TARGET_OBJECTS:secure-rng>)
+add_executable(bench_rng misc/bench_rng.c)
 target_include_directories(bench_rng PRIVATE include)
 target_link_libraries(bench_rng secure-rng)
 
-add_executable(test_rng misc/test_rng.c $<TARGET_OBJECTS:secure-rng>)
+add_executable(test_rng misc/test_rng.c)
 target_include_directories(test_rng PRIVATE include)
 target_link_libraries(test_rng secure-rng)
 
-add_executable(bench_pr_rng misc/bench_pr_rng.c $<TARGET_OBJECTS:secure-rng>)
+add_executable(bench_pr_rng misc/bench_pr_rng.c)
 target_include_directories(bench_pr_rng PRIVATE include)
 target_link_libraries(bench_pr_rng secure-rng)
 
-add_executable(test_pr_rng misc/test_pr_rng.c $<TARGET_OBJECTS:secure-rng>)
+add_executable(test_pr_rng misc/test_pr_rng.c)
 target_include_directories(test_pr_rng PRIVATE include)
 target_link_libraries(test_pr_rng secure-rng)
 
