@@ -10,7 +10,8 @@ https://en.wikipedia.org/wiki/Cryptographically_secure_pseudorandom_number_gener
 
 ### What hardware do I need to get this working?
 
-Intel AES-NI and Armv8 Cryptographic Extension are supported.
+* Intel AES-NI and Armv8 Cryptographic Extension are supported.
+* A software implementation is used if none of these are available for target platform.
 
 ### Limitations
 
