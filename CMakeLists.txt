@@ -43,6 +43,12 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS_ORIG} -maes -Os")
 add_library(secure-rng src/x86/aes.c src/secure-rng.c)
 endif()
 
+if (NOT secure_rng_aarch64 AND NOT secure_rng_x86)
+message(STATUS "Looking for AES support - no hardware extensions available, using software implementation")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS_ORIG} -Os")
+add_library(secure-rng src/generic/aes.c src/secure-rng.c)
+endif()
+
 target_include_directories(secure-rng PRIVATE include)
 
 set_target_properties(secure-rng PROPERTIES
