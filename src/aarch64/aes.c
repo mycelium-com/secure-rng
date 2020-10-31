@@ -3,7 +3,7 @@
  *  Radius Group, LLC
  *  balthazar@yandex.ru
  *
- *  Microsoft Reference Source License (Ms-RSL)
+ *  Apache License, Version 2.0
  */
 
 #include <arm_neon.h>
