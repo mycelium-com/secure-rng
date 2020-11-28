@@ -16,6 +16,7 @@ struct secure_rng_ctx {
     uint64_t  reseed_counter;
     uint64_t  reseed_interval;
     void (*resistance_seeder)(uint8_t seed_out[48]);
+    void (*aesctr256)(uint8_t *out, const uint8_t *sk, const void *counter, int bytes);
 } __attribute__ ((aligned (16)));
 
 #ifdef __cplusplus

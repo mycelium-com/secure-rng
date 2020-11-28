@@ -208,12 +208,12 @@ void aesctr256_direct_x4 (uint8_t *out, const uint8x16_t *rkeys, const void *cou
     }
 }
 
-void aesctr256_zeroiv (uint8_t *out, const uint8_t *sk, int bytes) {
+void aesctr256_zeroiv_hardware (uint8_t *out, const uint8_t *sk, int bytes) {
     uint8_t counter[16] = {0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0};
-    aesctr256(out, sk, counter, bytes);
+    aesctr256_hardware(out, sk, counter, bytes);
 }
 
-void aesctr256 (uint8_t *out, const uint8_t *k, const void *counter, int bytes) {
+void aesctr256_hardware (uint8_t *out, const uint8_t *k, const void *counter, int bytes) {
     uint8x16_t rkeys[15];
     expand256 (rkeys, (uint8x16_t *)k);
     aesctr256_direct_x4 (out, rkeys, counter, bytes);

@@ -61,7 +61,7 @@ static __m128i increment_be (__m128i x) {
     return x;
 }
 
-void aesctr256_direct_x4 (uint8_t *out, const __m128i *rkeys, const void *counter, size_t bytes) {
+static void aesctr256_direct_x4 (uint8_t *out, const __m128i *rkeys, const void *counter, size_t bytes) {
     __m128i s1, s2, s3, s4;
     __m128i ctr, *bo;
     /* bytes will always be a multiple of 16 */
@@ -166,12 +166,12 @@ void aesctr256_direct_x4 (uint8_t *out, const __m128i *rkeys, const void *counte
     }
 }
 
-void aesctr256_zeroiv (uint8_t *out, const uint8_t *sk, int bytes) {
+void aesctr256_zeroiv_hardware (uint8_t *out, const uint8_t *sk, int bytes) {
     uint8_t counter[16] = {0};
-    aesctr256(out, sk, counter, bytes);
+    aesctr256_hardware(out, sk, counter, bytes);
 }
 
-void aesctr256 (uint8_t *out, const uint8_t *k, const void *counter, int bytes) {
+void aesctr256_hardware (uint8_t *out, const uint8_t *k, const void *counter, int bytes) {
     __m128i rkeys[15];
     expand256 (rkeys, (__m128i *)k);
     aesctr256_direct_x4 (out, rkeys, counter, bytes);

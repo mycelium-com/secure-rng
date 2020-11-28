@@ -11,9 +11,16 @@
 extern "C" {
 #endif
 
-void aesctr256 (uint8_t *out, const uint8_t *sk, const void *counter, int bytes);
+#ifdef SOFTWARE_FALLBACK
+void aesctr256_software (uint8_t *out, const uint8_t *sk, const void *counter, int bytes);
+void aesctr256_zeroiv_software (uint8_t *out, const uint8_t *sk, int bytes);
+#endif
 
-void aesctr256_zeroiv (uint8_t *out, const uint8_t *sk, int bytes);
+#ifdef HARDWARE_SUPPORT
+void aesctr256_hardware (uint8_t *out, const uint8_t *sk, const void *counter, int bytes);
+void aesctr256_zeroiv_hardware (uint8_t *out, const uint8_t *sk, int bytes);
+int aes_hardware_supported();
+#endif
 
 #ifdef __cplusplus
 }

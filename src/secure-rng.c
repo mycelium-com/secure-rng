@@ -20,7 +20,7 @@ inline static void drbg_increment_v(struct secure_rng_ctx *ctx) {
 
 inline static void drbg_run_one_round(uint8_t buffer[16], struct secure_rng_ctx *ctx) {
     drbg_increment_v(ctx);
-    aesctr256 (buffer, ctx->Key, ctx->V, 16);
+    ctx->aesctr256 (buffer, ctx->Key, ctx->V, 16);
 }
 
 inline static void drbg_run_three_rounds(uint8_t buffer[48], struct secure_rng_ctx *ctx) {
@@ -56,6 +56,16 @@ void secure_rng_set_seeder(struct secure_rng_ctx *ctx, void (*resistance_seeder_
 int secure_rng_seed(struct secure_rng_ctx *ctx, const uint8_t entropy_input[48], const uint8_t *personalization_string, size_t personalization_len) {
     uint8_t round_bytes[48] = {0};
     uint8_t seed_material[48] = {0};
+
+    // Init by software implementation
+    ctx->aesctr256 = &aesctr256_software;
+
+#ifdef HARDWARE_SUPPORT
+    // If hardware implementation is supported then use it
+    if (aes_hardware_supported()) {
+        ctx->aesctr256 = &aesctr256_hardware;
+    }
+#endif
 
     // Check additional entropy buffer length
     if (personalization_len > 0) {

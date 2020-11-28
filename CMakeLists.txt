@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.9)
 project(secure-rng VERSION 1.0.0 DESCRIPTION "Secure random generator library")
 
+add_subdirectory ( extra/cpu_features )
+
 set(CMAKE_C_FLAGS_ORIG "${CMAKE_C_FLAGS}")
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS_ORIG} -march=armv8-a+simd+crypto")
@@ -13,7 +15,7 @@ try_compile(
         -DCOMPILE_DEFINITIONS:STRING=${CMAKE_REQUIRED_FLAGS_aarch64}
         -DINCLUDE_DIRECTORIES:STRING=${CMAKE_CURRENT_SOURCE_DIR}/include
     COMPILE_DEFINITIONS
-        "-DTRY_COMPILE"
+        "-DTRY_COMPILE -DHARDWARE_SUPPORT -DSOFTWARE_FALLBACK"
     C_STANDARD_REQUIRED
 )
 
@@ -27,25 +29,27 @@ try_compile(
         -DCOMPILE_DEFINITIONS:STRING=${CMAKE_REQUIRED_FLAGS_x86}
         -DINCLUDE_DIRECTORIES:STRING=${CMAKE_CURRENT_SOURCE_DIR}/include
     COMPILE_DEFINITIONS
-        "-DTRY_COMPILE"
+        "-DTRY_COMPILE -DHARDWARE_SUPPORT -DSOFTWARE_FALLBACK"
     C_STANDARD_REQUIRED
 )
 
 if (secure_rng_aarch64)
-message(STATUS "Looking for AES support - found armv8 SIMD")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS_ORIG} -march=armv8-a+simd+crypto -Os")
-add_library(secure-rng src/aarch64/aes.c src/secure-rng.c)
+message(STATUS "Looking for AES support by compiler - found armv8 SIMD")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS_ORIG} -march=armv8-a+simd+crypto -Os -DHARDWARE_SUPPORT -DSOFTWARE_FALLBACK")
+add_library(secure-rng src/aarch64/aes.c src/aarch64/detect.cpp src/secure-rng.c)
+target_link_libraries(secure-rng cpu_features)
 endif()
 
 if (secure_rng_x86)
-message(STATUS "Looking for AES support - found intel AES-NI")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS_ORIG} -maes -Os")
-add_library(secure-rng src/x86/aes.c src/secure-rng.c)
+message(STATUS "Looking for AES support by compiler - found intel AES-NI")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS_ORIG} -maes -O3 -DHARDWARE_SUPPORT -DSOFTWARE_FALLBACK")
+add_library(secure-rng src/generic/aes.c src/x86/aes.c src/x86/detect.cpp src/secure-rng.c)
+target_link_libraries(secure-rng cpu_features)
 endif()
 
 if (NOT secure_rng_aarch64 AND NOT secure_rng_x86)
-message(STATUS "Looking for AES support - no hardware extensions available, using software implementation")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS_ORIG} -Os")
+message(STATUS "Looking for AES support by compiler - no hardware extensions available for target platform, will be using software implementation only")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS_ORIG} -Os -DSOFTWARE_FALLBACK")
 add_library(secure-rng src/generic/aes.c src/secure-rng.c)
 endif()
 

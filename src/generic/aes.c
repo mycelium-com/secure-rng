@@ -325,7 +325,7 @@ static void Cipher(state_t* state, const uint8_t* RoundKey)
 }
 
 /* Symmetrical operation: same function for encrypting as for decrypting. Note any IV/nonce should never be reused with the same key */
-void AES_CTR_xcrypt_buffer(struct AES_ctx* ctx, uint8_t* buf, uint32_t length)
+static void AES_CTR_xcrypt_buffer(struct AES_ctx* ctx, uint8_t* buf, uint32_t length)
 {
   uint8_t buffer[AES_BLOCKLEN];
 
@@ -362,15 +362,14 @@ void AES_CTR_xcrypt_buffer(struct AES_ctx* ctx, uint8_t* buf, uint32_t length)
 /* Public functions:                                                         */
 /*****************************************************************************/
 
-void aesctr256 (uint8_t *out, const uint8_t *sk, const void *counter, int bytes)
+void aesctr256_software (uint8_t *out, const uint8_t *sk, const void *counter, int bytes)
 {
     struct AES_ctx ctx;
     AES_init_ctx_iv(&ctx, sk, (uint8_t *)counter);
     AES_CTR_xcrypt_buffer(&ctx, out, bytes);
 }
 
-void aesctr256_zeroiv (uint8_t *out, const uint8_t *sk, int bytes) {
+void aesctr256_zeroiv_software (uint8_t *out, const uint8_t *sk, int bytes) {
     uint8_t counter[16] = {0};
-    aesctr256(out, sk, counter, bytes);
+    aesctr256_software(out, sk, counter, bytes);
 }
-
