@@ -10,13 +10,14 @@ https://en.wikipedia.org/wiki/Cryptographically_secure_pseudorandom_number_gener
 
 ### What hardware do I need to get this working?
 
-Intel AES-NI and Armv8 Cryptographic Extension are supported.
+* Intel AES-NI and Armv8 Cryptographic Extension are supported.
+* A software implementation is used if none of these are available for target platform.
 
 ### Limitations
 
 * Each context instance is able to provide only a limited amount of generation rounds. Once a limit is exhausted, any attempt to generate new data will return RNG_NEED_RESEED error. This limit is hardcoded to 2^48 invocations.
 
-* You may deal with previous limitation by enabling prediction resistance. This is may be done using the ```secure_rng_set_seeder``` API function. If this feature is enabled then generator instance will be reseeded automatically with specified interval.
+* You may deal with previous limitation by enabling prediction resistance. This may be done using the ```secure_rng_set_seeder``` API function. If this feature is enabled then generator instance will be reseeded automatically with specified interval.
 
 * You may not generate more than 2^16 bytes through single invocation. If you need more data then use a loop to perform sufficient amount of ```secure_rng_bytes``` invocations.
 
