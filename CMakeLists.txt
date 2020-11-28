@@ -36,7 +36,7 @@ try_compile(
 if (secure_rng_aarch64)
 message(STATUS "Looking for AES support by compiler - found armv8 SIMD")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS_ORIG} -march=armv8-a+simd+crypto -Os -DHARDWARE_SUPPORT -DSOFTWARE_FALLBACK")
-add_library(secure-rng src/aarch64/aes.c src/aarch64/detect.cpp src/secure-rng.c)
+add_library(secure-rng src/generic/aes.c src/aarch64/aes.c src/aarch64/detect.cpp src/secure-rng.c)
 target_link_libraries(secure-rng cpu_features)
 endif()
 
