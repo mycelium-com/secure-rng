@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.9)
 project(secure-rng VERSION 1.0.0 DESCRIPTION "Secure random generator library")
 
+if (NOT IOS)
 add_subdirectory ( extra/cpu_features )
 
 set(CMAKE_C_FLAGS_ORIG "${CMAKE_C_FLAGS}")
@@ -45,6 +46,7 @@ message(STATUS "Looking for AES support by compiler - found intel AES-NI")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS_ORIG} -maes -O3 -DHARDWARE_SUPPORT -DSOFTWARE_FALLBACK")
 add_library(secure-rng src/generic/aes.c src/x86/aes.c src/x86/detect.cpp src/secure-rng.c)
 target_link_libraries(secure-rng cpu_features)
+endif()
 endif()
 
 if (NOT secure_rng_aarch64 AND NOT secure_rng_x86)
