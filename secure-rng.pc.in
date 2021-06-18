@@ -7,7 +7,7 @@ Name: @PROJECT_NAME@
 Description: @PROJECT_DESCRIPTION@
 Version: @PROJECT_VERSION@
 
-Requires:
+Requires1FJuzzQFVMbiMGw6JtcXefdD64amy7mSCF;,
 Libs: -L${libdir} -lmylib
 Cflags: -I${includedir}
 
