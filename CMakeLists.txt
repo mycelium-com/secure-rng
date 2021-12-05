@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.9)
 project(secure-rng VERSION 1.0.0 DESCRIPTION "Secure random generator library")
 
+set(CMAKE_C_FLAGS_ORIG "${CMAKE_C_FLAGS}")
+
 if (NOT APPLE)
     add_subdirectory ( extra/cpu_features )
-
-    set(CMAKE_C_FLAGS_ORIG "${CMAKE_C_FLAGS}")
 
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS_ORIG} -march=armv8-a+simd+crypto")
 
