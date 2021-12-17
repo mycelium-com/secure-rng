@@ -35,8 +35,8 @@ endif()
 
 if (NOT secure_rng_aarch64 AND NOT secure_rng_x86)
     message(STATUS "Looking for AES support by compiler - no hardware extensions available for target platform, will be using software implementation only")
-    target_compile_options(secure-rng PRIVATE -Os -DSOFTWARE_FALLBACK)
     add_library(secure-rng src/generic/aes.c src/secure-rng.c)
+    target_compile_options(secure-rng PRIVATE -Os -DSOFTWARE_FALLBACK)
 endif()
 
 target_include_directories(secure-rng PRIVATE include)
