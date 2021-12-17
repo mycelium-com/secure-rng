@@ -24,7 +24,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 if (secure_rng_aarch64)
     message(STATUS "Looking for AES support by compiler - found armv8 SIMD")
     add_library(secure-rng src/generic/aes.c src/aarch64/aes.c src/aarch64/detect.cpp src/secure-rng.c)
-    target_compile_options(secure-rng PRIVATE -march=armv8-a+simd+crypto -Os -DHARDWARE_SUPPORT -DSOFTWARE_FALLBACK)
+    target_compile_options(secure-rng PRIVATE -march=armv8-a+simd+crypto -O3 -DHARDWARE_SUPPORT -DSOFTWARE_FALLBACK)
 endif()
 
 if (secure_rng_x86)
